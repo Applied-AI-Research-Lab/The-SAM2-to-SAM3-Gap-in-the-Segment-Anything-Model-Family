@@ -1,0 +1,115 @@
+# SAM2 Configuration for MineApple Dataset
+# This configuration defines parameters for running SAM2 in prompt-based segmentation mode
+
+model:
+  name: "sam2"
+  checkpoint_path: "checkpoints/sam2/sam2.1_hiera_large.pt"
+  config_file: "configs/sam2.1/sam2.1_hiera_l.yaml"
+  device: "cuda"  # Options: cuda, cpu, mps
+  compile_model: false  # Set to true for faster inference with torch.compile
+  
+  # SAM2 specific parameters
+  image_size: 1024
+  backbone_stride: 16
+  num_maskmem: 7  # Number of memory frames for temporal tracking
+  
+prompt:
+  # Prompt generation strategy for SAM2
+  mode: "auto_grid"  # Options: auto_grid, center_point, bounding_box, manual
+  
+  # Auto grid parameters for automatic prompt generation
+  auto_grid:
+    points_per_side: 32  # Number of grid points per side
+    points_per_batch: 64
+    pred_iou_thresh: 0.88
+    stability_score_thresh: 0.95
+    stability_score_offset: 1.0
+    box_nms_thresh: 0.7
+    crop_n_layers: 0
+    crop_nms_thresh: 0.7
+    crop_overlap_ratio: 0.3413
+    crop_n_points_downscale_factor: 1
+    point_grids: null
+    min_mask_region_area: 0
+    
+  # Manual prompt parameters (used when mode is manual)
+  manual:
+    use_points: true
+    use_boxes: true
+    num_clicks_per_apple: 1  # Number of clicks to prompt each apple
+    
+dataset:
+  name: "mineapple"
+  root_dir: "data/mineapple_processed"
+  split: "test"  # Options: train, val, test
+  
+  # Image preprocessing
+  image_format: "RGB"
+  normalize: true
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+  
+  # Data loading
+  batch_size: 1  # SAM2 processes images sequentially
+  num_workers: 4
+  prefetch_factor: 2
+  
+inference:
+  # Inference parameters
+  multimask_output: true  # Generate multiple mask candidates
+  return_logits: false
+  
+  # Post-processing
+  apply_postprocessing: true
+  remove_small_regions: true
+  min_area: 100  # Minimum mask area in pixels
+  nms_thresh: 0.7
+  
+  # Temporal parameters (for video sequences)
+  use_temporal_memory: false  # Set to true for video input
+  memory_bank_size: 7
+  
+evaluation:
+  # Metrics to compute
+  compute_iou: true
+  compute_boundary_f1: true
+  compute_temporal_stability: false  # Only for video
+  
+  # IoU computation
+  iou_threshold: 0.5
+  
+  # Boundary F1 parameters
+  boundary_tolerance: 2  # pixels
+  
+  # Output settings
+  save_masks: true
+  save_visualizations: true
+  visualize_prompts: true
+  
+output:
+  # Output directory structure
+  results_dir: "results/sam2_baseline"
+  masks_dir: "results/sam2_baseline/masks"
+  viz_dir: "results/sam2_baseline/visualizations"
+  metrics_file: "results/sam2_mineapple_metrics.csv"
+  
+  # Logging
+  verbose: true
+  log_file: "logs/sam2_mineapple.log"
+  save_every_n: 10  # Save checkpoint every N images
+  
+experiment:
+  # Experiment metadata
+  name: "sam2_mineapple_baseline"
+  description: "SAM2 baseline evaluation on MineApple orchard dataset using visual prompts"
+  seed: 42
+  deterministic: true
+  
+  # Resource management
+  max_images: null  # Process all images; set to integer to limit
+  skip_existing: true  # Skip images that already have results
+  
+  # Tracking
+  use_wandb: false  # Enable Weights & Biases logging
+  wandb_project: "sam2-to-sam3-gap"
+  wandb_entity: null

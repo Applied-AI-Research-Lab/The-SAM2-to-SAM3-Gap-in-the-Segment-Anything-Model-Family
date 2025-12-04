@@ -1,0 +1,68 @@
+# Core Dependencies
+torch>=2.5.1
+torchvision>=0.20.1
+numpy>=1.24.4
+pillow>=10.0.0
+
+# SAM2 Dependencies
+segment-anything-2>=1.0
+
+# SAM3 Dependencies (install after HF authentication)
+# Install via: pip install git+https://github.com/facebookresearch/sam3.git
+huggingface-hub>=0.20.0
+
+# Data Processing
+opencv-python>=4.7.0
+scikit-image>=0.21.0
+pandas>=2.0.0
+pyyaml>=6.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.14.0
+
+# Metrics and Evaluation
+scikit-learn>=1.3.0
+scipy>=1.11.0
+
+# Utilities
+tqdm>=4.65.0
+requests>=2.31.0
+urllib3>=2.0.0
+
+# Jupyter Notebook Support
+jupyter>=1.0.0
+ipykernel>=6.25.0
+ipywidgets>=8.1.0
+notebook>=7.0.0
+
+# Experiment Tracking
+tensorboard>=2.13.0
+wandb>=0.15.0
+
+# Configuration Management
+hydra-core>=1.3.2
+omegaconf>=2.3.0
+
+# Testing and Quality
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.7.0
+flake8>=6.1.0
+mypy>=1.5.0
+
+# Documentation
+sphinx>=7.1.0
+sphinx-rtd-theme>=1.3.0
+
+# Additional ML Tools
+albumentations>=1.3.1
+timm>=0.9.7
+transformers>=4.30.0
+
+# GPU Acceleration
+nvidia-ml-py3>=7.352.0
+
+# Environment Management
+python-dotenv>=1.0.0

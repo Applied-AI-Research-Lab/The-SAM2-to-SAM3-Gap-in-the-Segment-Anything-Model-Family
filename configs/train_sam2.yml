@@ -1,0 +1,128 @@
+# SAM2 Fine-tuning Configuration
+# Geometric prompt-based segmentation training
+
+# Model configuration
+model:
+  type: "vit_h"  # Options: vit_h (huge), vit_l (large), vit_b (base)
+  checkpoint: "checkpoints/sam2_hiera_large.pt"  # Path to pretrained SAM2 checkpoint
+  
+  # Selective layer freezing for memory efficiency
+  freeze_image_encoder: false  # Set to true to freeze vision backbone (saves memory)
+  freeze_prompt_encoder: false  # Set to true to freeze prompt encoder
+
+# Data configuration
+data:
+  root_dir: "data/mineapple"  # Root directory with train/val/test splits
+  num_workers: 4  # Number of data loading workers
+  
+  # Data augmentation (optional)
+  augmentation:
+    enabled: true
+    horizontal_flip: 0.5
+    vertical_flip: 0.0
+    rotation: 15  # degrees
+    scale_range: [0.8, 1.2]
+    brightness: 0.2
+    contrast: 0.2
+
+# Training configuration
+training:
+  num_epochs: 50
+  batch_size: 2  # Adjust based on GPU memory (8 for 24GB, 4 for 16GB, 2 for 11GB)
+  learning_rate: 1.0e-4  # Initial learning rate
+  weight_decay: 0.01  # L2 regularization
+  
+  # Learning rate schedule
+  warmup_epochs: 2  # Linear warmup for first N epochs
+  # After warmup: cosine annealing to 0
+  
+  # Gradient clipping
+  gradient_clip: 1.0  # Maximum gradient norm
+  
+  # Mixed precision training
+  mixed_precision: true  # Use automatic mixed precision (AMP) for faster training
+  
+  # Prompt configuration
+  prompt_type: "point"  # Options: "point", "box"
+  # point: Sample random points from mask regions
+  # box: Use bounding boxes from masks
+  
+  # Multi-prompt training (advanced)
+  num_points_per_mask: 1  # Number of point prompts per mask
+  use_negative_points: false  # Include negative points outside masks
+
+# Loss function weights
+loss:
+  focal: 20.0      # Focal loss for class imbalance handling
+  dice: 1.0        # Dice loss for overlap optimization
+  iou: 1.0         # IoU prediction loss
+  bce: 5.0         # Binary cross-entropy loss
+  
+  # Focal loss parameters
+  focal_alpha: 0.25
+  focal_gamma: 2.0
+  
+  # Dice loss smoothing
+  dice_smooth: 1.0
+
+# Output configuration
+output:
+  save_dir: "results/training/sam2_finetune"  # Directory for checkpoints and logs
+  save_frequency: 5  # Save checkpoint every N epochs
+  
+  # Logging
+  log_frequency: 10  # Log metrics every N batches
+  visualize_predictions: true  # Save prediction visualizations during validation
+  num_visualization_samples: 8  # Number of samples to visualize
+
+# Hardware configuration
+hardware:
+  device: "cuda"  # cuda or cpu
+  # Memory management
+  pin_memory: true  # Pin memory for faster data transfer
+  persistent_workers: true  # Keep data loading workers alive
+  
+# Validation configuration
+validation:
+  enabled: true
+  frequency: 1  # Validate every N epochs
+  metrics:
+    - "iou"
+    - "dice"
+    - "boundary_f1"
+  
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 10  # Stop if no improvement for N epochs
+    min_delta: 0.001  # Minimum improvement to count as better
+
+# Resume training
+resume:
+  enabled: false
+  checkpoint_path: "results/training/sam2_finetune/latest_model.pth"
+
+# Random seed for reproducibility
+seed: 42
+
+# Notes and recommendations
+notes: |
+  Memory Usage Guidelines:
+  - Full fine-tuning (all layers trainable):
+    - batch_size=2: ~11GB GPU memory
+    - batch_size=4: ~16GB GPU memory
+    - batch_size=8: ~24GB GPU memory
+  
+  - Freeze image encoder (freeze_image_encoder=true):
+    - Saves ~30% memory
+    - Slightly lower final accuracy
+    - Good for limited GPU memory
+  
+  Best Practices:
+  - Start with learning_rate=1e-4 and adjust if needed
+  - Use mixed_precision=true for faster training
+  - Use point prompts for better generalization
+  - Use box prompts for faster convergence
+  
+  Typical Training Time (A100 GPU):
+  - 50 epochs on MineApple dataset: ~2-3 hours

@@ -1,0 +1,218 @@
+# SAM3 Evaluation Configuration
+# Defines metrics and evaluation protocols for concept-level and semantic assessment
+
+metrics:
+  # Concept-level metrics (primary for SAM3)
+  concept_recall:
+    enabled: true
+    compute_per_concept: true
+    aggregation_method: "mean"  # Options: mean, weighted_mean, median
+  
+  # Semantic grounding metrics
+  semantic_grounding:
+    enabled: true
+    grounding_iou: true
+    semantic_localization_error: true
+    concept_fidelity: true
+  
+  # Open-vocabulary evaluation
+  open_vocabulary:
+    enabled: true
+    zero_shot_f1: true
+    novel_concept_detection: true
+    synonym_robustness: true
+    
+    # Test on unseen concepts
+    test_concepts:
+      - "spotted apples"
+      - "clustered fruit"
+      - "small apples"
+      - "occluded apples"
+  
+  # Attribute-based metrics
+  attribute_accuracy:
+    enabled: true
+    attributes:
+      ripeness:
+        classes: ["ripe", "unripe", "partially_ripe"]
+        metric: "accuracy"
+      health:
+        classes: ["healthy", "damaged", "diseased"]
+        metric: "f1_score"
+      color:
+        classes: ["red", "green", "yellow"]
+        metric: "accuracy"
+  
+  # Traditional geometric metrics (for comparison with SAM2)
+  geometric:
+    iou: true
+    boundary_f1: true
+    dice_coefficient: true
+    thresholds: [0.5, 0.75, 0.9]
+  
+  # Instance-level metrics
+  instance:
+    instance_recall: true  # Proportion of GT instances detected
+    instance_precision: true  # Proportion of detected instances that are correct
+    duplicate_detection_rate: false
+    fragmentation_rate: true
+  
+  # Language understanding metrics
+  language_understanding:
+    prompt_sensitivity: true  # Performance across different phrasings
+    ambiguity_handling: true  # Performance on ambiguous prompts
+    negation_understanding: true  # Understanding of negative prompts
+    compositional_reasoning: true  # "ripe red apples" vs "ripe apples" + "red apples"
+
+evaluation:
+  # Evaluation protocol
+  protocol: "semantic"  # Options: semantic, standard, cross_validation
+  
+  # Semantic evaluation specific settings
+  semantic_evaluation:
+    text_prompt_variations: true
+    num_prompt_variants: 5
+    
+    # Test prompt robustness
+    prompt_perturbations:
+      - "synonym_substitution"
+      - "word_reordering"
+      - "additional_context"
+      - "negation"
+  
+  # Concept discovery evaluation
+  concept_discovery:
+    evaluate_automatic_discovery: true
+    discovery_recall: true
+    discovery_precision: true
+  
+  # Multimodal alignment analysis
+  multimodal_alignment:
+    vision_language_similarity: true
+    embedding_space_coherence: true
+    cross_modal_retrieval: false
+  
+  # Ground truth matching for concepts
+  matching:
+    concept_iou_threshold: 0.5
+    semantic_similarity_threshold: 0.7
+    use_hungarian_matching: true
+    allow_partial_matches: true
+
+output:
+  # Metrics output format
+  formats:
+    - "csv"
+    - "json"
+    - "tensorboard"
+  
+  # Per-concept results
+  per_concept_results: true
+  per_concept_file: "results/sam3_per_concept_metrics.csv"
+  
+  # Per-image results
+  per_image_results: true
+  per_image_file: "results/sam3_per_image_metrics.csv"
+  
+  # Aggregate results
+  aggregate_file: "results/sam3_aggregate_metrics.json"
+  
+  # Concept confusion matrix
+  save_confusion_matrix: true
+  confusion_matrix_file: "results/sam3_concept_confusion.csv"
+  
+  # Embedding visualizations
+  save_embeddings: false
+  embedding_file: "results/sam3_embeddings.npy"
+  
+  # Visualization
+  plot_metrics: true
+  plot_dir: "results/sam3_plots"
+  
+  # Logging
+  log_level: "INFO"
+  progress_bar: true
+
+visualization:
+  # Visualization settings for SAM3 evaluation
+  overlay_masks: true
+  show_concept_labels: true
+  color_by_concept: true
+  show_confidence_scores: true
+  
+  # Concept-specific visualization
+  concept_colors:
+    ripe_apples: [0, 255, 0]      # Green
+    unripe_apples: [255, 255, 0]  # Yellow
+    damaged_apples: [255, 0, 0]   # Red
+    healthy_apples: [0, 128, 255] # Light Blue
+  
+  # Semantic grounding visualization
+  show_attention_maps: false
+  show_text_alignment: true
+  
+  # Comparison with SAM2
+  side_by_side_comparison: true
+  highlight_semantic_differences: true
+  
+  # Error visualization
+  highlight_concept_errors: true
+  error_types:
+    semantic_confusion: [255, 165, 0]   # Orange
+    false_concept: [255, 0, 255]        # Magenta
+    missed_instance: [0, 0, 255]        # Blue
+    correct: [0, 255, 0]                 # Green
+
+reporting:
+  # Generate evaluation report
+  generate_report: true
+  report_format: "markdown"  # Options: markdown, html, pdf
+  report_file: "results/sam3_evaluation_report.md"
+  
+  # Report sections
+  include_summary_stats: true
+  include_per_concept_analysis: true
+  include_semantic_analysis: true
+  include_open_vocab_results: true
+  include_attribute_analysis: true
+  include_comparison_with_sam2: true
+  include_visualizations: true
+  include_failure_analysis: true
+  
+  # Comparison analysis
+  sam2_comparison:
+    load_sam2_results: true
+    sam2_results_file: "results/sam2_mineapple_metrics.csv"
+    
+    comparison_metrics:
+      - "iou"
+      - "boundary_f1"
+      - "instance_recall"
+      - "prompt_efficiency"
+    
+    generate_comparison_table: true
+    generate_comparison_plots: true
+
+failure_analysis:
+  # Analyze failure modes specific to SAM3
+  enabled: true
+  
+  # Categorize failures
+  failure_categories:
+    - "embedding_misalignment"      # Vision-language misalignment
+    - "language_ambiguity"           # Ambiguous text prompts
+    - "semantic_leakage"             # Segmenting similar but wrong concepts
+    - "concept_absence"              # Concept not present in image
+    - "visual_confusion"             # Similar visual appearance
+  
+  # Save failure cases
+  save_failure_examples: true
+  max_failures_per_category: 10
+  failure_dir: "results/sam3_failure_cases"
+  
+  # Analyze prompt sensitivity
+  prompt_sensitivity_analysis:
+    enabled: true
+    test_synonyms: true
+    test_paraphrases: true
+    test_different_granularity: true  # "fruit" vs "apple" vs "ripe apple"

@@ -1,0 +1,201 @@
+# SAM3 Fine-tuning Configuration
+# Vision-language concept-driven segmentation training
+# Based on official SAM3 training guidelines (github.com/facebookresearch/sam3/issues/163)
+
+# Model configuration
+model:
+  checkpoint: "checkpoints/sam3_hiera_l_coco_sav_vitl14_internvid10m.pt"  # Pretrained SAM3 checkpoint
+  
+  # Selective layer freezing (per SAM3 official guidelines)
+  freeze_vision_encoder: false  # Set to true to save memory (reduces trainable params by ~30%)
+  freeze_text_encoder: false    # Set to true to save memory (reduces trainable params by ~20%)
+  freeze_tracker: true          # Always true per SAM3 guidelines (tracker not trainable)
+  
+  # Memory efficiency note:
+  # Full fine-tuning: ~18GB GPU memory at batch_size=1, resolution=1008
+  # Freeze vision encoder: ~13GB GPU memory
+  # Freeze both encoders: ~9GB GPU memory
+
+# Data configuration (COCO-style format with noun_phrase field)
+data:
+  # Training data
+  train_annotation: "data/mineapple/annotations/train_coco.json"
+  train_images: "data/mineapple/train/images"
+  
+  # Validation data
+  val_annotation: "data/mineapple/annotations/val_coco.json"
+  val_images: "data/mineapple/val/images"
+  
+  # Data loading
+  num_workers: 4
+  
+  # Required annotation format (COCO-style JSON):
+  # {
+  #   "images": [{"id": 1, "file_name": "img1.jpg", "width": 1280, "height": 720}],
+  #   "annotations": [{
+  #     "id": 10,
+  #     "image_id": 1,
+  #     "category_id": 1,
+  #     "bbox": [100, 150, 200, 120],
+  #     "segmentation": [[100,150, 300,150, 300,270, 100,270]],  # Polygon or RLE
+  #     "area": 24000,
+  #     "iscrowd": 0,
+  #     "noun_phrase": "ripe red apple"  # Required: text prompt for concept
+  #   }],
+  #   "categories": [{"id": 1, "name": "object"}]
+  # }
+  
+  # Data augmentation
+  augmentation:
+    enabled: true
+    horizontal_flip: 0.5
+    scale_jitter: [0.8, 1.2]
+    color_jitter: 0.4
+
+# Training configuration
+training:
+  num_epochs: 30  # Fewer epochs than SAM2 (pre-training helps convergence)
+  batch_size: 1   # Start with 1 due to high memory usage (~18GB)
+  resolution: 1008  # Input image resolution (1008 recommended per SAM3)
+  
+  learning_rate: 5.0e-5  # Lower than SAM2 (model already pre-trained on concepts)
+  weight_decay: 0.05     # Higher weight decay for large model
+  
+  # Learning rate schedule
+  warmup_epochs: 2       # Linear warmup
+  # After warmup: cosine annealing
+  
+  # Gradient management
+  gradient_clip: 1.0     # Gradient clipping for stability
+  gradient_accumulation: 4  # Accumulate gradients over N steps (effective batch_size = batch_size * gradient_accumulation)
+  
+  # Mixed precision
+  mixed_precision: true  # Essential for memory efficiency
+  
+  # Text prompt configuration
+  max_text_length: 77    # Maximum text prompt length (CLIP tokenizer)
+  use_negative_prompts: true  # Include negative text prompts (no matching masks)
+  negative_prompt_ratio: 0.2  # 20% of prompts are negative
+
+# Loss function weights
+loss:
+  segmentation: 1.0  # Mask segmentation loss (focal + dice)
+  grounding: 0.5     # Vision-language grounding loss
+  attribute: 0.3     # Semantic attribute matching loss (optional)
+  
+  # Segmentation loss components
+  focal_weight: 20.0
+  dice_weight: 1.0
+  focal_alpha: 0.25
+  focal_gamma: 2.0
+  
+  # Grounding loss parameters
+  contrastive_temperature: 0.07  # Temperature for contrastive learning
+  
+# Output configuration
+output:
+  save_dir: "results/training/sam3_finetune"
+  save_frequency: 5  # Save every N epochs
+  
+  # Logging and visualization
+  log_frequency: 10
+  visualize_predictions: true
+  num_visualization_samples: 8
+  
+  # Export format
+  export_onnx: false  # Export to ONNX after training
+
+# Hardware configuration
+hardware:
+  device: "cuda"
+  pin_memory: true
+  persistent_workers: true
+  
+  # Memory optimization
+  empty_cache_frequency: 10  # Clear CUDA cache every N batches
+  
+# Validation configuration
+validation:
+  enabled: true
+  frequency: 1  # Validate every epoch
+  
+  metrics:
+    geometric:
+      - "iou"
+      - "dice"
+      - "boundary_f1"
+    semantic:
+      - "concept_recall"
+      - "concept_precision"
+      - "grounding_accuracy"
+  
+  # Concept-specific evaluation
+  evaluate_attributes: true  # Test attribute understanding (e.g., "ripe" vs "unripe")
+  
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 8
+    monitor: "val_loss"  # or "concept_recall" for semantic focus
+
+# Resume training
+resume:
+  enabled: false
+  checkpoint_path: "results/training/sam3_finetune/latest_model.pth"
+
+# HuggingFace Hub integration (optional)
+huggingface:
+  enabled: false
+  push_to_hub: false
+  repo_id: "your-username/sam3-mineapple-finetuned"
+  private: true
+
+# Random seed
+seed: 42
+
+# Notes and recommendations (from SAM3 issue #163)
+notes: |
+  SAM3 Fine-tuning Guidelines (Official):
+  
+  1. Memory Requirements:
+     - Full fine-tuning: ~18GB GPU at batch_size=1, resolution=1008
+     - Use gradient_accumulation to simulate larger batches
+     - Freeze vision/text encoders to reduce memory
+  
+  2. What Gets Trained:
+     - Detector: ALWAYS trained (core segmentation head)
+     - Shared backbone: ALWAYS trained (feature extraction)
+     - Tracker: NEVER trained (inference mode only, per SAM3 design)
+     - Vision encoder: Optional (freeze to save memory)
+     - Text encoder: Optional (freeze to save memory)
+  
+  3. Dataset Format:
+     - Must use COCO-style JSON with noun_phrase field
+     - Each annotation needs text prompt (concept description)
+     - Support for negative prompts (phrases with no masks)
+     - Segmentation format: polygon or RLE
+  
+  4. Best Practices:
+     - Start with lower learning rate than SAM2 (5e-5 vs 1e-4)
+     - Use gradient accumulation for effective larger batches
+     - Include negative text prompts for robustness
+     - Monitor both geometric and semantic metrics
+  
+  5. Training Time (A100 GPU):
+     - 30 epochs on 1000 images: ~4-6 hours
+     - Faster convergence than SAM2 (leverages pre-training)
+  
+  6. Common Issues:
+     - OOM errors: Reduce resolution or freeze encoders
+     - Poor grounding: Increase grounding loss weight
+     - Overfitting: Add more negative prompts
+  
+  7. Evaluation:
+     - Test on both seen and unseen concepts
+     - Verify open-vocabulary capability
+     - Check attribute understanding accuracy
+  
+  References:
+  - Official training guide: sam3/train/train.py
+  - Issue discussion: github.com/facebookresearch/sam3/issues/163
+  - Dataset format: Similar to SA-Co and VEval datasets

@@ -1,0 +1,146 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# Model Checkpoints (too large for Git)
+checkpoints/
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+*.bin
+
+# Dataset Files (too large for Git)
+data/mineapple_raw/
+data/mineapple_processed/
+data/*.zip
+data/*.tar
+data/*.tar.gz
+data/*.h5
+data/*.hdf5
+
+# Experiment Results
+results/*.csv
+results/*.json
+results/*.png
+results/*.jpg
+results/*.jpeg
+results/qualitative_examples/*.png
+results/qualitative_examples/*.jpg
+results/sam2_outputs/
+results/sam3_outputs/
+
+# Logs
+logs/
+*.log
+*.out
+*.err
+tensorboard_logs/
+wandb/
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Compiled Documentation
+docs/_build/
+docs/_static/
+docs/_templates/
+
+# Coverage Reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# SAM Model Specific
+sam2_weights/
+sam3_weights/
+*.safetensors
+
+# Large Result Files
+*.mp4
+*.avi
+*.mov
+*.gif
+
+# Backup Files
+*.bak
+*.backup
+*~
+
+# Profiling Data
+*.prof
+*.lprof
+
+# Keep Directory Structure But Ignore Contents
+results/sam2_mineapple_metrics.csv
+results/sam3_mineapple_metrics.csv
+results/comparison_summary.csv
+
+# Keep Sample Images (small files for demos)
+!data/sample_images/*.jpg
+!data/sample_images/*.png
+
+# Keep Important Documentation
+!docs/*.md
+!*.md

@@ -1,0 +1,199 @@
+# SAM3 Configuration for MineApple Dataset
+# This configuration defines parameters for running SAM3 in concept-driven segmentation mode
+
+model:
+  name: "sam3"
+  checkpoint_path: "checkpoints/sam3/sam3_model.pt"
+  device: "cuda"  # Options: cuda, cpu
+  compile_model: false  # Set to true for faster inference with torch.compile
+  
+  # SAM3 specific parameters
+  image_size: 1008  # SAM3 uses 1008x1008 resolution
+  confidence_threshold: 0.5  # Confidence threshold for concept detection
+  
+  # Vision-language fusion parameters
+  vision_encoder:
+    params: 450000000  # 450M parameters
+    backbone: "perception_encoder"
+  
+  text_encoder:
+    params: 300000000  # 300M parameters
+    type: "causal"
+    pretrained: true
+  
+  # BPE tokenizer path
+  bpe_path: "assets/bpe_simple_vocab_16e6.txt.gz"
+  
+prompt:
+  # Concept-based prompting for SAM3
+  mode: "text"  # Options: text, exemplar, multimodal
+  
+  # Text prompt configuration
+  text:
+    # Primary text prompts for apple segmentation
+    prompts:
+      - "ripe apples"
+      - "all apples"
+      - "red apples"
+      - "healthy apples"
+    
+    # Attribute-based prompts for detailed analysis
+    attribute_prompts:
+      ripeness:
+        - "ripe apples"
+        - "unripe apples"
+        - "partially ripe apples"
+      health:
+        - "healthy apples"
+        - "damaged apples"
+        - "diseased apples"
+      color:
+        - "red apples"
+        - "green apples"
+        - "yellow apples"
+    
+    # Negative prompts to exclude
+    negative_prompts:
+      - "leaves"
+      - "branches"
+      - "sky"
+      - "ground"
+  
+  # Exemplar-based prompting (optional)
+  exemplar:
+    use_exemplars: false
+    exemplar_dir: "data/exemplars"
+    num_positive_examples: 3
+    num_negative_examples: 2
+  
+  # Multimodal fusion settings
+  multimodal:
+    combine_text_and_exemplar: false
+    fusion_method: "cross_attention"  # Options: cross_attention, concatenation
+  
+dataset:
+  name: "mineapple"
+  root_dir: "data/mineapple_processed"
+  split: "test"  # Options: train, val, test
+  
+  # Image preprocessing (SAM3 uses different normalization)
+  image_format: "RGB"
+  normalize: true
+  mean: [0.5, 0.5, 0.5]  # SAM3 uses simpler normalization
+  std: [0.5, 0.5, 0.5]
+  
+  # Data loading
+  batch_size: 1
+  num_workers: 4
+  prefetch_factor: 2
+  
+inference:
+  # Semantic segmentation parameters
+  use_presence_token: true  # Enable presence modeling for ambiguity handling
+  use_moe_head: true  # Use mixture-of-experts segmentation head
+  
+  # Detection parameters
+  score_threshold: 0.5
+  detection_nms_thresh: 0.1
+  association_iou_thresh: 0.1
+  
+  # Concept grounding
+  semantic_grounding_threshold: 0.6
+  concept_recall_threshold: 0.7
+  
+  # Post-processing
+  remove_overlapping_masks: true
+  overlap_threshold: 0.8
+  min_mask_area: 100  # pixels
+  
+  # Instance discovery
+  max_instances_per_concept: 100
+  auto_discover_instances: true
+  
+evaluation:
+  # Semantic evaluation metrics
+  compute_concept_recall: true
+  compute_semantic_iou: true
+  compute_open_vocab_f1: true
+  compute_attribute_accuracy: true
+  
+  # Traditional geometric metrics (for comparison with SAM2)
+  compute_geometric_iou: true
+  compute_boundary_f1: true
+  
+  # Concept-level evaluation
+  concept_categories:
+    - "all_apples"
+    - "ripe_apples"
+    - "unripe_apples"
+    - "healthy_apples"
+    - "damaged_apples"
+  
+  # Attribute evaluation
+  evaluate_attributes:
+    ripeness: true
+    health: true
+    color: true
+    size: false
+  
+  # Zero-shot generalization testing
+  test_unseen_concepts: true
+  unseen_concept_prompts:
+    - "spotted apples"
+    - "small apples"
+    - "clustered apples"
+  
+output:
+  # Output directory structure
+  results_dir: "results/sam3_concept"
+  masks_dir: "results/sam3_concept/masks"
+  viz_dir: "results/sam3_concept/visualizations"
+  metrics_file: "results/sam3_mineapple_metrics.csv"
+  
+  # Concept-specific outputs
+  save_per_concept_masks: true
+  save_concept_embeddings: false
+  save_attention_maps: false
+  
+  # Visualization options
+  visualize_text_prompts: true
+  visualize_concept_labels: true
+  color_by_concept: true
+  
+  # Logging
+  verbose: true
+  log_file: "logs/sam3_mineapple.log"
+  save_every_n: 10
+  
+experiment:
+  # Experiment metadata
+  name: "sam3_mineapple_concept"
+  description: "SAM3 concept-level evaluation on MineApple dataset using text prompts"
+  seed: 42
+  deterministic: true
+  
+  # Ablation studies
+  ablation:
+    run_ablations: false
+    disable_presence_token: false
+    disable_moe: false
+    text_only: true  # Use only text prompts (no exemplars)
+  
+  # Comparison with SAM2
+  compare_with_sam2: true
+  sam2_results_path: "results/sam2_baseline"
+  
+  # Resource management
+  max_images: null
+  skip_existing: true
+  
+  # Tracking
+  use_wandb: false
+  wandb_project: "sam2-to-sam3-gap"
+  wandb_entity: null
+  
+  # Multimodal alignment analysis
+  analyze_alignment:
+    compute_vision_language_similarity: false
+    save_embedding_space: false
+    visualize_concept_clusters: false

@@ -1,0 +1,146 @@
+# SAM2 Evaluation Configuration
+# Defines metrics and evaluation protocols for geometric and temporal assessment
+
+metrics:
+  # Primary geometric metrics
+  iou:
+    enabled: true
+    thresholds: [0.5, 0.75, 0.9, 0.95]
+    compute_per_class: false
+    compute_mean: true
+  
+  # Boundary quality metrics
+  boundary_f1:
+    enabled: true
+    tolerance_pixels: [1, 2, 3, 5]
+    default_tolerance: 2
+  
+  # Mask quality metrics
+  mask_quality:
+    compute_precision: true
+    compute_recall: true
+    compute_f1: true
+    compute_dice: true
+  
+  # Temporal metrics (for video sequences)
+  temporal:
+    enabled: false  # Enable for video evaluation
+    identity_preservation: true
+    temporal_iou: true
+    track_length_analysis: true
+    occlusion_handling: true
+  
+  # Prompt efficiency metrics
+  prompt_efficiency:
+    clicks_per_object: true
+    time_per_prompt: true
+    interaction_rounds: true
+  
+  # Spatial accuracy
+  spatial:
+    centroid_error: true
+    area_error: true
+    aspect_ratio_error: false
+
+evaluation:
+  # Evaluation protocol
+  protocol: "standard"  # Options: standard, cross_validation, bootstrap
+  
+  # Cross-validation settings (if protocol is cross_validation)
+  cross_validation:
+    n_folds: 5
+    stratified: true
+    shuffle: true
+  
+  # Bootstrap settings (if protocol is bootstrap)
+  bootstrap:
+    n_iterations: 1000
+    confidence_level: 0.95
+    sample_size: null  # null means same as dataset size
+  
+  # Ground truth matching
+  matching:
+    iou_threshold: 0.5
+    allow_multiple_matches: false
+    hungarian_matching: true
+  
+  # Error analysis
+  error_analysis:
+    categorize_errors: true
+    error_categories:
+      - "false_positive"
+      - "false_negative"
+      - "boundary_error"
+      - "fragmentation"
+      - "merging"
+    
+    visualize_errors: true
+    save_error_cases: true
+
+output:
+  # Metrics output format
+  formats:
+    - "csv"
+    - "json"
+    - "tensorboard"
+  
+  # Summary statistics
+  summary:
+    compute_mean: true
+    compute_std: true
+    compute_median: true
+    compute_percentiles: [25, 50, 75, 90, 95]
+  
+  # Per-image results
+  per_image_results: true
+  per_image_file: "results/sam2_per_image_metrics.csv"
+  
+  # Aggregate results
+  aggregate_file: "results/sam2_aggregate_metrics.json"
+  
+  # Visualization
+  plot_metrics: true
+  plot_dir: "results/sam2_plots"
+  
+  # Logging
+  log_level: "INFO"
+  progress_bar: true
+
+visualization:
+  # Visualization settings for SAM2 evaluation
+  overlay_masks: true
+  show_prompts: true
+  show_boundaries: true
+  
+  # Color schemes
+  mask_alpha: 0.5
+  boundary_color: [255, 0, 0]  # Red
+  prompt_color: [0, 255, 0]    # Green
+  
+  # Comparison visualizations
+  side_by_side: true
+  show_gt_comparison: true
+  
+  # Error visualization
+  highlight_errors: true
+  error_color_scheme:
+    false_positive: [255, 0, 0]    # Red
+    false_negative: [0, 0, 255]    # Blue
+    correct: [0, 255, 0]            # Green
+
+reporting:
+  # Generate evaluation report
+  generate_report: true
+  report_format: "markdown"  # Options: markdown, html, pdf
+  report_file: "results/sam2_evaluation_report.md"
+  
+  # Report sections
+  include_summary_stats: true
+  include_per_class_analysis: false
+  include_error_analysis: true
+  include_visualizations: true
+  include_comparison_tables: true
+  
+  # Comparison with baselines
+  compare_with_baselines: false
+  baseline_results: null
