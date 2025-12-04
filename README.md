@@ -15,6 +15,19 @@ This repository contains the official implementation and experimental code for o
 ¹Cornell University, Ithaca, NY 14850, USA  
 ²University of the Peloponnese, Tripoli 22131, Greece
 
+## Citation
+
+If you use this code or our findings in your research, please cite:
+
+```bibtex
+@article{sapkota2025sam2sam3gap,
+  title={The SAM2-to-SAM3 Gap in the Segment Anything Model Family: Why Prompt-Based Expertise Fails in Concept-Driven Image Segmentation},
+  author={Sapkota, Ranjan and Roumeliotis, Konstantinos I. and Karkee, Manoj},
+  journal={arXiv preprint arXiv:XXXX.XXXXX},
+  year={2025}
+}
+```
+
 ### Abstract
 
 This paper investigates the fundamental discontinuity between SAM2 and SAM3, explaining why expertise in prompt-based segmentation fails to transfer to SAM3's concept-driven, multimodal paradigm. SAM2 operates through spatial prompts—points, boxes, and masks—yielding purely geometric and temporal segmentation. In contrast, SAM3 introduces a unified vision–language architecture capable of open-vocabulary reasoning, semantic grounding, contrastive alignment, and exemplar-based concept understanding.
@@ -290,19 +303,6 @@ Expected improvements after fine-tuning:
 - Training time: 4-6 hours on A100 GPU
 
 Detailed results are available in the `results/` directory and the paper.
-
-## Citation
-
-If you use this code or our findings in your research, please cite:
-
-```bibtex
-@article{sapkota2025sam2sam3gap,
-  title={The SAM2-to-SAM3 Gap in the Segment Anything Model Family: Why Prompt-Based Expertise Fails in Concept-Driven Image Segmentation},
-  author={Sapkota, Ranjan and Roumeliotis, Konstantinos I. and Karkee, Manoj},
-  journal={arXiv preprint arXiv:XXXX.XXXXX},
-  year={2025}
-}
-```
 
 ## License
 
