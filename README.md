@@ -315,14 +315,6 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENS
 - University of the Peloponnese for research support
 - The MineApple dataset curators at University of Minnesota
 
-## Contact
-
-For questions or collaborations:
-
-- **Ranjan Sapkota**: [rs2468@cornell.edu](mailto:rs2468@cornell.edu)
-- **Konstantinos I. Roumeliotis**: [kroumeliotis@uop.gr](mailto:kroumeliotis@uop.gr)
-- **Manoj Karkee**: [manoj.karkee@cornell.edu](mailto:manoj.karkee@cornell.edu)
-
 ## Links
 
 - [arXiv Paper](https://arxiv.org/) (pending)
