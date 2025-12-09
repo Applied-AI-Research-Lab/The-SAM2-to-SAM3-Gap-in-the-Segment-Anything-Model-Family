@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![arXiv](https://img.shields.io/badge/arXiv-pending-b31b1b.svg)](https://arxiv.org/)
+[![arXiv](https://img.shields.io/badge/arXiv-pending-b31b1b.svg)](https://arxiv.org/abs/2512.06032)
 
 ## Overview
 
@@ -24,6 +24,8 @@ If you use this code or our findings in your research, please cite:
   title={The SAM2-to-SAM3 Gap in the Segment Anything Model Family: Why Prompt-Based Expertise Fails in Concept-Driven Image Segmentation},
   author={Sapkota, Ranjan and Roumeliotis, Konstantinos I. and Karkee, Manoj},
   journal={arXiv preprint arXiv:XXXX.XXXXX},
+  doi={10.48550/arXiv.2512.06032},
+  url={https://arxiv.org/abs/2512.06032},
   year={2025}
 }
 ```
@@ -317,7 +319,7 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENS
 
 ## Links
 
-- [arXiv Paper](https://arxiv.org/) (pending)
+- [arXiv Paper](https://arxiv.org/abs/2512.06032)
 - [SAM2 GitHub](https://github.com/facebookresearch/sam2)
 - [SAM3 GitHub](https://github.com/facebookresearch/sam3)
 - [MineApple Dataset](https://conservancy.umn.edu/)
