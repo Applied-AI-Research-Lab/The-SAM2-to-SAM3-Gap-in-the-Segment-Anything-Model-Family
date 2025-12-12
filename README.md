@@ -17,7 +17,7 @@ This repository contains the official implementation and experimental code for o
 
 ## Citation
 
-If you use this code or our findings in your research, please cite:
+If you use this code or our findings in your research, please [cite](https://arxiv.org/abs/2512.06032):
 
 ```bibtex
 @article{sapkota2025sam2sam3gap,
