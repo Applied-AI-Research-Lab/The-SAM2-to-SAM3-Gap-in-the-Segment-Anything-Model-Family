@@ -23,7 +23,7 @@ If you use this code or our findings in your research, please cite:
 @article{sapkota2025sam2sam3gap,
   title={The SAM2-to-SAM3 Gap in the Segment Anything Model Family: Why Prompt-Based Expertise Fails in Concept-Driven Image Segmentation},
   author={Sapkota, Ranjan and Roumeliotis, Konstantinos I. and Karkee, Manoj},
-  journal={arXiv preprint arXiv:XXXX.XXXXX},
+  journal={arXiv preprint 	arXiv:2512.06032},
   doi={10.48550/arXiv.2512.06032},
   url={https://arxiv.org/abs/2512.06032},
   year={2025}
